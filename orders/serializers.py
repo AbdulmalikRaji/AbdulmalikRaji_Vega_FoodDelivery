@@ -11,6 +11,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    restaurant = serializers.ReadOnlyField(source='restaurant.name')
 
     class Meta:
         model = Order

@@ -33,7 +33,7 @@ class OrderCreateView(generics.CreateAPIView):
         # Create the order
         order = Order.objects.create(user=user, restaurant=nearest_restaurant, status='processing')
 
-        # Add food items to the order with specified quantities
+        # Add food items to the order
         for item in food_items:
             food_id = item['food_id']
             quantity = item['quantity']

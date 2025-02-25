@@ -18,10 +18,10 @@ class Order(models.Model):
     order_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Order #{self.id} by {self.user.username}"
+        return f"Order #{self.id} by {self.user.username} bought {self.food_items}"
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     rating = models.PositiveSmallIntegerField(null=True, blank=True)

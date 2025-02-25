@@ -3,7 +3,7 @@ from orders.models import Order
 from datetime import timedelta
 
 def check_expired_orders():
-    # Calculate the expiration time (15 minutes ago)
+    # After 15 minutes
     expiration_time = timezone.now() - timedelta(minutes=15)
     
     # Get all processing orders older than 15 minutes
