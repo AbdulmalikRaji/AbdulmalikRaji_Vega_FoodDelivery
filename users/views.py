@@ -11,8 +11,10 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .utils import email_verification_token
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from .utils import reset_password_token
+from django.contrib.auth.hashers import make_password
 
 
 User = get_user_model()
@@ -99,3 +101,65 @@ class VerifyEmailView(APIView):
                 return Response({"error": "Invalid verification link."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "Invalid verification link."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+
+        try:
+            # Get user by email
+            user = User.objects.get(email=email)
+
+            # Generate reset link
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = reset_password_token.make_token(user)
+            reset_link = request.build_absolute_uri(
+                reverse('reset-password', kwargs={'uidb64': uid, 'token': token})
+            )
+
+            # Send reset email
+            send_mail(
+                subject='Reset Your Password',
+                message=f'Click the link to reset your password: {reset_link}',
+                from_email='no-reply@fooddelivery.com',
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+
+            return Response({"message": "Password reset link sent!"}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request, uidb64, token):
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if new_password != confirm_password:
+            return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Decode user ID and get user object
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = get_object_or_404(User, pk=uid)
+
+            # Check the token
+            if reset_password_token.check_token(user, token):
+                # Set new password and save
+                user.password = make_password(new_password)
+                user.save()
+
+                return Response({"message": "Password reset successful!"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": "Invalid request."}, status=status.HTTP_400_BAD_REQUEST)
