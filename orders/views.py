@@ -1,14 +1,17 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from .models import Order, OrderItem
-from .serializers import OrderSerializer, OrderRequestSerializer
+from .serializers import OrderSerializer, OrderRequestSerializer, RatingSerializer
 from restaurants.models import Food, Restaurant
 from users.models import CustomUser
 from django.utils import timezone
 from datetime import timedelta
 import threading
-from django.db.models import F
+from django.db.models import F, Avg
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
@@ -66,3 +69,36 @@ class OrderListView(generics.ListAPIView):
         user = self.request.user
         # Return only the orders made by this user
         return Order.objects.filter(user=user)
+    
+class SubmitRatingView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        serializer = RatingSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            order_item_id = serializer.validated_data['id']
+            rating = serializer.validated_data['rating']
+            comment = serializer.validated_data.get('comment', '')
+
+            # Get the order and item
+            ordered_food = OrderItem.objects.get(id=order_item_id)
+            
+
+            # Update each item with the rating and comment
+            ordered_food.rating = rating
+            if ordered_food.comment:
+                ordered_food.comment = comment
+
+            ordered_food.save()
+
+            # Calculate the new average rating for the food
+            food_id = ordered_food.food_id
+            food = Food.objects.get(id=food_id)
+            avg_rating = OrderItem.objects.filter(food=food).aggregate(Avg('rating'))['rating__avg']
+            food.rating = round(avg_rating, 2)  # Round to 2 decimal places
+            food.save()
+
+            return Response({"message": "Rating submitted successfully!"}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

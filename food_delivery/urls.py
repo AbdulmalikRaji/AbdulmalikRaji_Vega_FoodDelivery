@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from pages.homepage import homepage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("__reload__/", include("django_browser_reload.urls")),
     path('user/', include('users.urls')),
     path('api/restaurants/', include('restaurants.urls')),
     path('api/orders/', include('orders.urls')),
+    path('', include('pages.urls')),
 ]

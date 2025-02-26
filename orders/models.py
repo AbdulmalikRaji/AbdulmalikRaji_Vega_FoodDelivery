@@ -25,6 +25,8 @@ class OrderItem(models.Model):
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     rating = models.PositiveSmallIntegerField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+
 
     def __str__(self):
         return f"{self.food.name} (x{self.quantity})"
