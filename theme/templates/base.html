@@ -1,49 +1,88 @@
-{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>{% block title %}Food Delivery{% endblock %}</title>
-  {% tailwind_css %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind (CDN for simplicity) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* BODY BACKGROUND GRADIENT */
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Subtle dark-blue gradient */
+      background: linear-gradient(135deg, #27384b 0%, #2E3C50 100%);
+      color: #E4E6EB;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAVBAR & FOOTER BACKGROUND */
+    .navbar-bg {
+      background-color: #2E3C50;
+    }
+
+    /* CARD & ELEMENT STYLES */
+    .card-bg {
+      background-color: #232D3A; 
+    }
+
+    /* HOVER STATES */
+    .hover-light:hover {
+      background-color: #3B4A5A !important;
+      transition: background-color 0.2s ease-in-out;
+    }
+  </style>
 </head>
-<body class="bg-blue-900 text-white font-sans">
 
+<body>
   <!-- Navbar -->
-  <nav class="flex items-center justify-between px-8 py-4 bg-blue-800">
-    <div class="text-3xl font-extrabold tracking-wider">
-      Food Delivery
-    </div>
+  <nav class="navbar-bg p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo -->
+      <a href="#"
+         class="text-2xl font-bold tracking-wide text-[#E4E6EB] hover:text-white transition">
+        Food Delivery
+      </a>
 
-    <div class="space-x-4">
-      {% if user.is_authenticated %}
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
-          My Orders
-        </a>
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
-          Menu
-        </a>
-      {% else %}
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
-          Login
-        </a>
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
-          Sign Up
-        </a>
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
-          Menu
-        </a>
-      {% endif %}
+      <!-- Nav Buttons -->
+      <div class="space-x-4">
+        <a href="#" class="text-[#E4E6EB] hover:text-white transition">Menu</a>
+
+        {% if user.is_authenticated %}
+          <a href="#" class="text-[#E4E6EB] hover:text-white transition">My Orders</a>
+          <a href="#" class="text-[#E4E6EB] hover:text-white transition">Cart</a>
+          <a href="{% url 'logout' %}" class="text-[#E4E6EB] hover:text-white transition">Logout</a>
+        {% else %}
+          <a href="{% url 'login-page' %}" class="text-[#E4E6EB] hover:text-white transition">Login</a>
+          <a href="#" class="text-[#E4E6EB] hover:text-white transition">Sign Up</a>
+        {% endif %}
+      </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <main>
+  <main class="container mx-auto py-8 flex-1">
     {% block content %}{% endblock %}
   </main>
 
   <!-- Footer -->
-  <footer class="py-4 bg-blue-800 text-center">
-    <p class="text-sm text-gray-300">&copy; 2025 Food Delivery. All rights reserved.</p>
+  <footer class="navbar-bg p-4 text-center text-[#B0B3B8]">
+    &copy; 2025 Food Delivery. All rights reserved.
   </footer>
 </body>
 </html>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Food Delivery{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[70vh]">
+  <div class="bg-[#1c1f25] shadow-lg rounded-2xl p-8 w-full max-w-md">
+    <h2 class="text-3xl text-[#66B2FF] font-semibold mb-6 text-center">Login</h2>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      <input
+        type="text"
+        name="username"
+        placeholder="Username"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#080e15] placeholder-[#0f161d] focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <button
+        type="submit"
+        class="w-full py-3 rounded-md bg-[#66B2FF] text-white font-semibold hover:bg-[#559ED9] transition"
+      >
+        Login
+      </button>
+
+      <div class="text-center text-[#8A8D91] mt-4">
+        <a href="#" class="hover:text-[#66B2FF] transition">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

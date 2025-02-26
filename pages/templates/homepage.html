@@ -1,16 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - Food Delivery{% endblock %}
+{% block title %}Home | Food Delivery{% endblock %}
 
 {% block content %}
   <!-- Hero Section -->
   <header class="flex flex-col items-center justify-center text-center py-20">
-    <h1 class="text-5xl font-bold mb-4">Welcome to Food Delivery!</h1>
-    <p class="max-w-lg text-xl mb-8">
+    <h1 class="text-5xl font-bold mb-4 text-[#E4E6EB]">Welcome to Food Delivery!</h1>
+    <p class="max-w-lg text-xl mb-8 text-[#B0B3B8]">
       Enjoy delicious meals delivered straight to your door.
     </p>
-    <a href="#" class="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition">
+    <a href="#"
+       class="bg-[#4E4F50] hover:bg-[#5A5B5C] text-white font-semibold py-3 px-8 rounded-full transition">
       Browse Full Menu
     </a>
   </header>
+
+  <!-- Featured Food Items -->
+  <h2 class="text-3xl font-bold mb-8 text-center text-[#E4E6EB]">Featured Food Items</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    {% for item in featured_foods %}
+      <!-- Card -->
+      <div class="card-bg rounded-lg shadow-lg flex flex-col hover:shadow-2xl transition">
+        <a href="#">
+        <!-- Image -->
+        <img
+          src="{{ item.image_url }}"
+          alt="{{ item.name }}"
+          class="w-full h-48 object-cover rounded-t-lg"
+        />
+
+        <!-- Card Content -->
+        <div class="p-4 flex flex-col flex-grow">
+          <h2 class="text-xl font-semibold mb-2 text-white">{{ item.name }}</h2>
+
+          <!-- Truncated Description -->
+          <p class="text-sm text-[#B0B3B8] mb-2 h-16 overflow-hidden">
+            {{ item.description }}
+          </p>
+
+          <!-- Price -->
+          <p class="text-white font-bold mb-2">${{ item.price }}</p>
+
+          <!-- Rating -->
+          {% if item.rating > 0 %}
+            <p class="text-[#f5c518] mb-2">
+              Rating: {{ item.rating }} <span class="inline-block">&#9733;</span>
+            </p>
+          {% else %}
+            <p class="text-[#f5c518] mb-2">
+              Not rated
+            </p>
+          {% endif %}
+
+          <!-- Buttons at Bottom -->
+          <div class="mt-auto">
+            <a href="#ttv"
+              class="block w-full bg-[#1877F2] hover:bg-[#166fe0] text-white px-4 py-2 rounded transition text-center">
+              View Details
+            </a>
+          </div>
+        </div>
+      </a>
+      </div>
+    {% endfor %}
+  </div>
+
 {% endblock %}

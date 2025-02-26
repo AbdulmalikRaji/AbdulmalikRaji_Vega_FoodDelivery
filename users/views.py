@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .utils import email_verification_token
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from .utils import reset_password_token
 from django.contrib.auth.hashers import make_password
@@ -43,6 +43,12 @@ class LoginView(APIView):
             })
         else:
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home') 
 
 
 class SignupView(APIView):
