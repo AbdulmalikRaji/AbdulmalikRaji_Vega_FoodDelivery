@@ -9,8 +9,8 @@
     <p class="max-w-lg text-xl mb-8 text-[#B0B3B8]">
       Enjoy delicious meals delivered straight to your door.
     </p>
-    <a href="#"
-       class="bg-[#4E4F50] hover:bg-[#5A5B5C] text-white font-semibold py-3 px-8 rounded-full transition">
+    <a href="{% url 'menu-page' %}"
+       class="py-3 px-8 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold rounded-full transition shadow-lg">
       Browse Full Menu
     </a>
   </header>
@@ -20,47 +20,44 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
     {% for item in featured_foods %}
       <!-- Card -->
-      <div class="card-bg rounded-lg shadow-lg flex flex-col hover:shadow-2xl transition">
+      <div class="card-bg rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-2">
         <a href="#">
-        <!-- Image -->
-        <img
-          src="{{ item.image_url }}"
-          alt="{{ item.name }}"
-          class="w-full h-48 object-cover rounded-t-lg"
-        />
+          <!-- Image -->
+          <img src="{{ item.image_url }}" alt="{{ item.name }}"
+               class="w-full h-48 object-cover rounded-t-lg" />
 
-        <!-- Card Content -->
-        <div class="p-4 flex flex-col flex-grow">
-          <h2 class="text-xl font-semibold mb-2 text-white">{{ item.name }}</h2>
+          <!-- Card Content -->
+          <div class="p-4 flex flex-col">
+            <h2 class="text-xl font-semibold mb-2 text-white">{{ item.name }}</h2>
 
-          <!-- Truncated Description -->
-          <p class="text-sm text-[#B0B3B8] mb-2 h-16 overflow-hidden">
-            {{ item.description }}
-          </p>
-
-          <!-- Price -->
-          <p class="text-white font-bold mb-2">${{ item.price }}</p>
-
-          <!-- Rating -->
-          {% if item.rating > 0 %}
-            <p class="text-[#f5c518] mb-2">
-              Rating: {{ item.rating }} <span class="inline-block">&#9733;</span>
+            <!-- Truncated Description -->
+            <p class="text-sm text-[#B0B3B8] mb-2 h-16 overflow-hidden">
+              {{ item.description }}
             </p>
-          {% else %}
-            <p class="text-[#f5c518] mb-2">
-              Not rated
-            </p>
-          {% endif %}
 
-          <!-- Buttons at Bottom -->
-          <div class="mt-auto">
-            <a href="#ttv"
-              class="block w-full bg-[#1877F2] hover:bg-[#166fe0] text-white px-4 py-2 rounded transition text-center">
-              View Details
-            </a>
+            <!-- Price -->
+            <p class="text-white font-bold mb-2">${{ item.price }}</p>
+
+            <!-- Rating -->
+            {% if item.rating > 0 %}
+              <p class="text-[#f5c518] mb-2">
+                Rating: {{ item.rating }} <span class="inline-block">&#9733;</span>
+              </p>
+            {% else %}
+              <p class="text-[#f5c518] mb-2">
+                Not rated
+              </p>
+            {% endif %}
+
+            <!-- Button at Bottom -->
+            <div class="mt-auto">
+              <a href="#"
+                class="block w-full py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-full transition text-center shadow-lg">
+                View Details
+              </a>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
       </div>
     {% endfor %}
   </div>

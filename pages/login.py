@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import redirect
+from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import render
 
@@ -18,7 +17,6 @@ class LoginPageView(View):
         if user is not None:
             # Login the user
             login(request, user)
-            return redirect('home')  # Redirect to homepage after login
+            return JsonResponse({"message": "Login successful!"}, status=200)
         else:
-            messages.error(request, 'Invalid username or password.')
-            return redirect('login-page') # Redirect to login page
+            return JsonResponse({"error": "Invalid username or password."}, status=400)

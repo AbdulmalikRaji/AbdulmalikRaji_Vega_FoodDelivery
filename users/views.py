@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from .utils import reset_password_token
 from django.contrib.auth.hashers import make_password
+import re
 
 
 User = get_user_model()
@@ -67,7 +68,7 @@ class SignupView(APIView):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = email_verification_token.make_token(user)
                 verification_link = request.build_absolute_uri(
-                    reverse('verify-email', kwargs={'uidb64': uid, 'token': token})
+                    reverse('email-verified', kwargs={'uidb64': uid, 'token': token})
                 )
 
                 send_mail(
@@ -123,13 +124,13 @@ class ForgotPasswordView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = reset_password_token.make_token(user)
             reset_link = request.build_absolute_uri(
-                reverse('reset-password', kwargs={'uidb64': uid, 'token': token})
+                reverse('reset-password-page', kwargs={'uidb64': uid, 'token': token})
             )
 
             # Send reset email
             send_mail(
                 subject='Reset Your Password',
-                message=f'Click the link to reset your password: {reset_link}',
+                message=f'Click the link to reset password for user @{user.username}: {reset_link}',
                 from_email='no-reply@fooddelivery.com',
                 recipient_list=[user.email],
                 fail_silently=False,
@@ -148,6 +149,12 @@ class ResetPasswordView(APIView):
     def post(self, request, uidb64, token):
         new_password = request.data.get('new_password')
         confirm_password = request.data.get('confirm_password')
+
+        # Check password requirements
+        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)', new_password):
+            return Response({
+                "error": "Password must have at least one uppercase letter, one lowercase letter, and one number."
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if new_password != confirm_password:
             return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)

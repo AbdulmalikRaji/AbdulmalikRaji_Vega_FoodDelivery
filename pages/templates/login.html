@@ -7,7 +7,7 @@
   <div class="bg-[#1c1f25] shadow-lg rounded-2xl p-8 w-full max-w-md">
     <h2 class="text-3xl text-[#66B2FF] font-semibold mb-6 text-center">Login</h2>
 
-    <form method="post" class="space-y-4">
+    <form method="post" id="login-form" class="space-y-4">
       {% csrf_token %}
 
       <input
@@ -26,17 +26,85 @@
         required
       />
 
+      <!-- Button with Spinner -->
       <button
         type="submit"
-        class="w-full py-3 rounded-md bg-[#66B2FF] text-white font-semibold hover:bg-[#559ED9] transition"
+        id="login-button"
+        class="w-full py-3 rounded-md bg-[#66B2FF] text-white font-semibold hover:bg-[#559ED9] transition flex justify-center items-center"
       >
-        Login
+        <svg id="spinner" class="hidden animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span id="button-text">Login</span>
       </button>
 
       <div class="text-center text-[#8A8D91] mt-4">
-        <a href="#" class="hover:text-[#66B2FF] transition">Forgot Password?</a>
+        <a href="{% url 'forgot-password-page' %}" class="hover:text-[#66B2FF] transition">Forgot Password?</a>
       </div>
     </form>
   </div>
 </div>
+
+<script>
+  // Handle form submission
+  document.getElementById("login-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Button and Spinner Elements
+    const loginButton = document.getElementById("login-button");
+    const buttonText = document.getElementById("button-text");
+    const spinner = document.getElementById("spinner");
+
+    // Disable Button and Show Spinner
+    loginButton.disabled = true;
+    buttonText.textContent = "Logging In...";
+    spinner.classList.remove("hidden");
+
+    // Clear existing errors
+    const existingErrors = document.querySelectorAll('.error-message');
+    existingErrors.forEach(el => el.remove());
+
+    fetch("{% url 'login-page' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+      },
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return response.json().then(data => {
+          throw data;
+        });
+      }
+    })
+    .then(data => {
+      if (data.message) {
+        window.location.href = "{% url 'home' %}";
+      }
+    })
+    .catch(error => {
+      const errorContainer = document.createElement('div');
+      errorContainer.classList.add('text-red-500', 'mt-4');
+
+      // Display error message
+      const errorMessage = document.createElement('p');
+      errorMessage.classList.add('error-message');
+      errorMessage.textContent = error.error || 'An unknown error occurred.';
+      errorContainer.appendChild(errorMessage);
+
+      form.appendChild(errorContainer);
+
+      // Re-enable Button and Hide Spinner
+      loginButton.disabled = false;
+      buttonText.textContent = "Login";
+      spinner.classList.add("hidden");
+    });
+  });
+</script>
 {% endblock %}

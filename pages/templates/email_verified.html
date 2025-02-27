@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Verified - Food Delivery{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[70vh]">
+  <div class="bg-[#1c1f25] shadow-lg rounded-2xl p-8 w-full max-w-md text-center">
+    <h2 class="text-3xl text-[#66B2FF] font-semibold mb-6">Email Verification</h2>
+
+    {% if success_message %}
+      <p class="text-green-500 mb-6">
+        {{ success_message }}
+      </p>
+      <a href="{% url 'login-page' %}" 
+         class="py-2 px-6 rounded-md bg-[#66B2FF] text-white font-semibold hover:bg-[#559ED9] transition">
+         Go to Login
+      </a>
+    {% endif %}
+
+    {% if error_message %}
+      <p class="text-red-500 mb-6">
+        {{ error_message }}
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

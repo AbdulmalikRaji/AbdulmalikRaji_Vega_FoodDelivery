@@ -30,10 +30,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.food.name} (x{self.quantity})"
-
-
-
-# def update_food_rating(food):
-#     average_rating = OrderItem.objects.filter(food=food, rating__isnull=False).aggregate(Avg('rating'))['rating__avg']
-#     food.rating = round(average_rating, 2) if average_rating else 0.00
-#     food.save()

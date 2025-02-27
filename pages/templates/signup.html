@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Food Delivery{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[70vh]">
+  <div class="bg-[#1c1f25] shadow-lg rounded-2xl p-8 w-full max-w-md">
+    <h2 class="text-3xl text-[#66B2FF] font-semibold mb-6 text-center">Sign Up</h2>
+
+    <form method="post" id="signup-form" class="space-y-4">
+      {% csrf_token %}
+
+      <input
+        type="text"
+        name="first_name"
+        placeholder="First Name"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="text"
+        name="last_name"
+        placeholder="Last Name"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="text"
+        name="username"
+        placeholder="Username"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="password"
+        name="confirm_password"
+        placeholder="Confirm Password"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input
+        type="text"
+        id="delivery_location"
+        name="delivery_location"
+        placeholder="Delivery Address"
+        class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+        required
+      />
+
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
+
+      <!-- Button with Spinner -->
+      <button
+        type="submit"
+        id="signup-button"
+        class="w-full py-3 rounded-md bg-[#66B2FF] text-white font-semibold hover:bg-[#559ED9] transition flex justify-center items-center"
+      >
+        <svg id="spinner" class="hidden animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span id="button-text">Sign Up</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Get geolocation coordinates
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        document.getElementById("latitude").value = position.coords.latitude;
+        document.getElementById("longitude").value = position.coords.longitude;
+      },
+      function(error) {
+        console.log("Geolocation not available: " + error.message);
+      }
+    );
+  } else {
+    console.log("Geolocation is not supported by this browser.");
+  }
+
+  // Handle form submission
+  document.getElementById("signup-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Convert formData to JSON object
+    const jsonData = {};
+    formData.forEach((value, key) => {
+      jsonData[key] = value;
+    });
+
+    // Button and Spinner Elements
+    const signupButton = document.getElementById("signup-button");
+    const buttonText = document.getElementById("button-text");
+    const spinner = document.getElementById("spinner");
+
+    // Disable Button and Show Spinner
+    signupButton.disabled = true;
+    buttonText.textContent = "Signing Up...";
+    spinner.classList.remove("hidden");
+
+    // Clear existing errors
+    const existingErrors = document.querySelectorAll('.error-message');
+    existingErrors.forEach(el => el.remove());
+
+    fetch("{% url 'signup' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(jsonData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return response.json().then(data => {
+          throw data;
+        });
+      }
+    })
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        window.location.href = "{% url 'login-page' %}";
+      }
+    })
+    .catch(error => {
+      const errorContainer = document.createElement('div');
+      errorContainer.classList.add('text-red-500', 'mt-4');
+
+      for (const [field, messages] of Object.entries(error)) {
+        const errorMessage = document.createElement('p');
+        errorMessage.classList.add('error-message');
+        errorMessage.textContent = `${field}: ${messages.join(', ')}`;
+        errorContainer.appendChild(errorMessage);
+      }
+
+      form.appendChild(errorContainer);
+
+      // Re-enable Button and Hide Spinner
+      signupButton.disabled = false;
+      buttonText.textContent = "Sign Up";
+      spinner.classList.add("hidden");
+    });
+  });
+</script>
+{% endblock %}

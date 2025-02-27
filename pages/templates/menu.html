@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu - Food Delivery{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+  <h1 class="text-4xl text-center font-semibold text-[#66B2FF] mb-8">Menu</h1>
+
+      <!-- Filters Container -->
+      <div class="bg-[#1c1f25] p-6 rounded-lg shadow-lg mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <!-- Name Filter -->
+            <div>
+                <label for="name-filter" class="text-[#B0B3B8] block mb-2">Search by Name</label>
+                <input
+                    type="text"
+                    id="name-filter"
+                    placeholder="Search by name"
+                    class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+                />
+            </div>
+
+            <!-- Dual Price Range Filter -->
+            <div>
+                <label class="text-[#B0B3B8] block mb-2">Price Range: <span id="price-range-label">$0 - $1000</span></label>
+                <div class="flex items-center gap-2">
+                    <input
+                        type="range"
+                        id="min-price-range"
+                        min="0"
+                        max="1000"
+                        value="0"
+                        class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#66B2FF]"
+                        oninput="updatePriceRangeLabel()"
+                    />
+                    <input
+                        type="range"
+                        id="max-price-range"
+                        min="0"
+                        max="1000"
+                        value="1000"
+                        class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#66B2FF]"
+                        oninput="updatePriceRangeLabel()"
+                    />
+                </div>
+            </div>
+
+            <!-- Rating Filter -->
+            <div>
+                <label for="rating-filter" class="text-[#B0B3B8] block mb-2">Rating</label>
+                <select
+                    id="rating-filter"
+                    class="w-full p-3 rounded-md bg-[#2A2E36] text-[#66B2FF] focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+                >
+                    <option value="">All Ratings</option>
+                    <option value="1">1+ Star</option>
+                    <option value="2">2+ Stars</option>
+                    <option value="3">3+ Stars</option>
+                    <option value="4">4+ Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Filters and Comments per Item Row -->
+        <div class="flex justify-between items-center mt-6">
+            <!-- Apply Filters Button -->
+            <button
+                onclick="fetchFoodItems()"
+                class="py-2 px-8 rounded-md bg-[#66B2FF] hover:bg-[#559ED9] text-white font-semibold transition"
+            >
+                Apply Filters
+            </button>
+
+            <!-- Number of Comments Selector -->
+            <div class="flex items-center">
+                <label for="num-comments" class="text-[#B0B3B8] mr-2">Comments per Item:</label>
+                <select
+                    id="num-comments"
+                    class="p-2 pb-0 w-12 rounded-md bg-[#2A2E36] text-[#66B2FF] focus:outline-none focus:ring-2 focus:ring-[#66B2FF]"
+                    onchange="fetchFoodItems()"
+                >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+
+  <!-- Food List -->
+  <div id="food-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Food items will be loaded here by JS -->
+  </div>
+</div>
+
+<script>
+  function updatePriceRangeLabel() {
+    const minPrice = document.getElementById('min-price-range').value;
+    const maxPrice = document.getElementById('max-price-range').value;
+    document.getElementById('price-range-label').textContent = `$${minPrice} - $${maxPrice}`;
+  }
+
+  function fetchFoodItems() {
+  const name = document.getElementById('name-filter').value;
+  const minPrice = document.getElementById('min-price-range').value;
+  const maxPrice = document.getElementById('max-price-range').value;
+  const rating = document.getElementById('rating-filter').value;
+  const numComments = document.getElementById('num-comments').value;
+
+  const params = new URLSearchParams();
+  if (name) params.append('name', name);
+  if (minPrice) params.append('min_price', minPrice);
+  if (maxPrice) params.append('max_price', maxPrice);
+  if (rating) params.append('min_rating', rating);
+  if (numComments) params.append('num_comments', numComments);
+
+  fetch(`/api/restaurants/food/?${params.toString()}`)
+    .then(response => response.json())
+    .then(data => {
+      const foodList = document.getElementById('food-list');
+      foodList.innerHTML = '';
+
+      data.forEach(food => {
+        const foodItem = document.createElement('div');
+        foodItem.classList.add(
+          'bg-[#1c1f25]', 
+          'shadow-lg', 
+          'rounded-2xl', 
+          'p-4', 
+          'text-center', 
+          'transition', 
+          'transform', 
+          'hover:scale-105', 
+          'hover:shadow-2xl'
+        );
+
+        // Constructing comments section
+        let commentsHtml = '';
+        if (food.comments && food.comments.length > 0) {
+          commentsHtml += '<div class="text-left mt-4">';
+          commentsHtml += '<h3 class="text-lg text-[#66B2FF] font-semibold mb-2">Comments:</h3>';
+          food.comments.forEach(comment => {
+            commentsHtml += `
+              <p class="text-sm text-[#B0B3B8] mb-1">
+                <span class="font-bold text-[#66B2FF]">${comment.username}:</span>
+                "${comment.comment}" - ${comment.rating} ★
+              </p>`;
+          });
+          commentsHtml += '</div>';
+        } else {
+          commentsHtml += '<p class="text-sm text-[#B0B3B8] mb-1">No comments yet.</p>';
+        }
+
+        foodItem.innerHTML = `
+          <a href="/menu/${food.id}/" class="group">
+            <img src="${food.image_url}" alt="${food.name}" class="w-full h-48 object-cover rounded-lg mb-4 transition transform group-hover:scale-105">
+            <h2 class="text-2xl text-[#66B2FF] font-semibold mb-2 group-hover:underline transition">${food.name}</h2>
+          </a>
+          <p class="text-[#B0B3B8] mb-2">${food.description}</p>
+          <p class="text-[#66B2FF] font-bold mb-2">$${food.price}</p>
+          <p class="text-yellow-400 mb-4">${food.rating} ★</p>
+          ${commentsHtml}
+          <button class="py-2 px-4 rounded-md bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold transition">
+            Add to Cart
+          </button>
+        `;
+
+        foodList.appendChild(foodItem);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching food items:', error);
+    });
+}
+
+
+  // Initial fetch
+  fetchFoodItems();
+</script>
+{% endblock %}
