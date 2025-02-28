@@ -165,9 +165,9 @@
           <p class="text-[#66B2FF] font-bold mb-2">$${food.price}</p>
           <p class="text-yellow-400 mb-4">${food.rating} ★</p>
           ${commentsHtml}
-          <button class="py-2 px-4 rounded-md bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold transition">
+          <a href="/add-to-cart/${food.id}/" class="py-2 px-4 rounded-md bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold transition">
             Add to Cart
-          </button>
+          </a>
         `;
 
         foodList.appendChild(foodItem);

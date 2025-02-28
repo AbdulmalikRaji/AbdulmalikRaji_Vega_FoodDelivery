@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import render
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class LoginPageView(View):
     def get(self, request):
@@ -17,6 +18,9 @@ class LoginPageView(View):
         if user is not None:
             # Login the user
             login(request, user)
+            refresh = RefreshToken.for_user(user)
+            request.session['access_token'] = str(refresh.access_token)
+            request.session['refresh_token'] = str(refresh)
             return JsonResponse({"message": "Login successful!"}, status=200)
         else:
             return JsonResponse({"error": "Invalid username or password."}, status=400)

@@ -16,6 +16,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         user = request.user

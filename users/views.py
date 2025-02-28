@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from .utils import reset_password_token
 from django.contrib.auth.hashers import make_password
+from rest_framework.authtoken.models import Token
 import re
 
 
@@ -63,6 +64,9 @@ class SignupView(APIView):
             try:
                 # Create user within a transaction
                 user = serializer.save()
+
+                # Generate Token
+                Token.objects.get_or_create(user=user)
 
                 # Send verification email
                 uid = urlsafe_base64_encode(force_bytes(user.pk))

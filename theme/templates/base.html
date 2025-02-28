@@ -46,12 +46,17 @@
             >Menu</a
           >
 
+          <a href="{% url 'cart-view' %}" id="cart-count" class="text-[#E4E6EB] hover:text-white transition relative">
+            Cart
+            {% if cart_count > 0 %}
+              <sup>
+              {{ cart_count }}
+            </sup>
+            {% endif %}
+          </a>
           {% if user.is_authenticated %}
           <a href="#" class="text-[#E4E6EB] hover:text-white transition"
             >My Orders</a
-          >
-          <a href="#" class="text-[#E4E6EB] hover:text-white transition"
-            >Cart</a
           >
           <a
             href="#"

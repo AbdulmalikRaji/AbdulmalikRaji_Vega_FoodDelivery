@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ food.name }} - Food Details{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+  <div class="bg-[#1c1f25] p-6 rounded-lg shadow-lg">
+    <!-- Image and Title -->  
+    <img src="{{ food.image_url }}" alt="{{ food.name }}" class="w-fit h-80 object-cover rounded-lg mb-4">
+    <h1 class="text-4xl font-bold text-[#66B2FF] mb-4">{{ food.name }}</h1>
+
+    <!-- Price and Description -->
+    <div class="mb-6">
+      <p class="text-2xl text-[#66B2FF] font-bold">${{ food.price }}</p>
+      <p class="text-[#B0B3B8] mt-2">{{ food.description }}</p>
+    </div>
+
+    <a href="{% url 'add-to-cart' food.id %}" 
+   class="mt-4 inline-block py-2 px-4 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-full transition">
+   Add to Cart
+</a>
+
+    <!-- Last 10 Comments -->
+    <div class="bg-[#2A2E36] p-4 rounded-lg mt-6">
+      <h2 class="text-2xl text-[#66B2FF] font-semibold mb-4">Comments:</h2>
+      
+      {% if comments %}
+        <ul class="space-y-4">
+          {% for comment in comments %}
+            <li class="border-b border-gray-700 pb-4">
+              <p class="text-sm text-[#66B2FF] font-bold">{{ comment.order.user.username }} 
+              <span class="text-[#B0B3B8] text-xs ml-2">({{ comment.order.order_time|date:"M d, Y" }})</span></p>
+              <p class="text-[#B0B3B8] mt-1">"{{ comment.comment }}"</p>
+              <p class="text-yellow-400">Rating: {{ comment.rating }} ★</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-[#B0B3B8]">No comments yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

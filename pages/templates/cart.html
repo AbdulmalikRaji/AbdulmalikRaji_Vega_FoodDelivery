@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+  <div class="bg-[#1c1f25] p-6 rounded-lg shadow-lg">
+    <h1 class="text-4xl font-bold text-[#66B2FF] mb-4">Your Cart</h1>
+    <ul>
+      {% for item in cart_items %}
+        <li class="border-b border-gray-700 py-8 flex justify-between items-center">
+          <div>
+            <span class="text-[#E4E6EB]">
+                <a href="{% url 'food-detail' item.food.id %}" class=" hover:underline transition">{{ item.food.name }}</a>({{ item.quantity }})</span>
+            <p class="text-sm text-[#B0B3B8]">Price: ${{ item.food.price }}</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              onclick="updateCart('{{ item.food.id }}', 'decrease')"
+              class="py-1 px-4 bg-[#f69a31] hover:bg-[#f79047] text-white rounded-md transition">
+              -
+            </button>
+            <span class="text-[#66B2FF] font-bold">{{ item.quantity }}</span>
+            <button 
+              onclick="updateCart('{{ item.food.id }}', 'increase')"
+              class="py-1 px-4 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-md transition">
+              +
+            </button>
+            <button 
+              onclick="updateCart('{{ item.food.id }}', 'delete')"
+              class="py-1 px-4 bg-[#f6413b] hover:bg-[#f74747e4] text-white rounded-md transition">
+              x
+            </button>
+          </div>
+          <span class="text-[#66B2FF]">${{ item.total_price }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="text-2xl text-[#66B2FF] font-bold mt-6">Total: ${{ total_amount }}</p>
+
+    <!-- Error Message Container -->
+    <div id="error-message" class="text-red-500 mt-4"></div>
+
+    <!-- Checkout Button -->
+    <button 
+      onclick="showConfirmationPopup()"
+      class="mt-4 inline-block py-2 px-4 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-full transition">
+      Checkout
+    </button>
+  </div>
+</div>
+
+<!-- Confirmation Popup Modal -->
+<div id="confirmation-popup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-[#2A2E36] p-6 rounded-lg shadow-lg text-center w-full max-w-md">
+    <h2 class="text-2xl text-[#66B2FF] font-semibold mb-4">Confirm Order</h2>
+    <p class="text-[#E4E6EB] mb-6">Are you sure you want to place this order?</p>
+    <div class="space-x-4">
+      <button
+        onclick="confirmOrder()"
+        class="py-2 px-6 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-md transition"
+      >
+        Yes
+      </button>
+      <button
+        onclick="closeConfirmationPopup()"
+        class="py-2 px-6 bg-[#f6413b] hover:bg-[#f74747e4] text-white rounded-md transition"
+      >
+        No
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateCart(foodId, action) {
+    fetch(`/cart/update/${foodId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ action: action })
+    })
+    .then(response => {
+      if (response.ok) {
+        location.reload();  // Reload the cart to reflect changes
+      } else {
+        alert('Failed to update cart.');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  function checkoutOrder() {
+    fetch('/order/checkout/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(result => {
+      if (result.status === 200) {
+        alert('Order placed successfully!');
+        window.location.href = '/';
+      } else {
+        // Show error message above the checkout button
+        const errorMessage = result.body.error || 'Failed to place order. Please try again.';
+        const errorContainer = document.getElementById('error-message');
+        errorContainer.textContent = errorMessage;
+        errorContainer.classList.remove('hidden'); 
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  // Show Confirmation Popup
+  function showConfirmationPopup() {
+    // Check if there are any items in the cart
+    const hasItems = {{ cart_items|length }} > 0;
+    
+    if (hasItems) {
+      const popup = document.getElementById('confirmation-popup');
+      popup.classList.remove('hidden');
+    } else {
+      // Show error if no items in cart
+      const errorContainer = document.getElementById('error-message');
+      errorContainer.textContent = "Your cart is empty. Add items before checking out.";
+      errorContainer.classList.remove('hidden'); 
+    }
+  }
+
+  // Close Confirmation Popup
+  function closeConfirmationPopup() {
+    const popup = document.getElementById('confirmation-popup');
+    popup.classList.add('hidden');
+  }
+
+  // Confirm Order and Trigger Checkout
+  function confirmOrder() {
+    closeConfirmationPopup();
+    checkoutOrder();
+  }
+</script>
+{% endblock %}

@@ -21,7 +21,6 @@
     {% for item in featured_foods %}
       <!-- Card -->
       <div class="card-bg rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-2">
-        <a href="#">
           <!-- Image -->
           <img src="{{ item.image_url }}" alt="{{ item.name }}"
                class="w-full h-48 object-cover rounded-t-lg" />
@@ -51,13 +50,12 @@
 
             <!-- Button at Bottom -->
             <div class="mt-auto">
-              <a href="#"
+              <a href="{% url 'food-detail' item.id %}"
                 class="block w-full py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-full transition text-center shadow-lg">
                 View Details
               </a>
             </div>
           </div>
-        </a>
       </div>
     {% endfor %}
   </div>

@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect
 from django.views import View
 import requests
 from django.conf import settings
+from dotenv import load_dotenv
+import os
 
 class SignupPageView(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'signup.html')
 
     def post(self, request, *args, **kwargs):
+
+        load_dotenv()
+
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         username = request.POST.get('username')
@@ -20,7 +25,7 @@ class SignupPageView(View):
 
         # If latitude and longitude are empty, use Geocoding API to get them
         if not latitude or not longitude:
-            google_maps_api_key = 'YOUR_GOOGLE_MAPS_API_KEY'
+            google_maps_api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
             geocode_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={delivery_location}&key={google_maps_api_key}"
             
             response = requests.get(geocode_url)
