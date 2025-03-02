@@ -53,7 +53,7 @@ class OrderCreateView(generics.CreateAPIView):
 
         # Release restaurant after 15 minutes
         try:
-            release_restaurant.apply_async((nearest_restaurant.id,), countdown=900)
+            release_restaurant.apply_async((nearest_restaurant.id, order.id,), countdown=900)
         except Exception as e:
             transaction.set_rollback(True)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
