@@ -11,6 +11,8 @@ import threading
 from django.db.models import F, Avg
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .tasks import release_restaurant
+from django.db import transaction
 
 
 class OrderCreateView(generics.CreateAPIView):
@@ -18,6 +20,7 @@ class OrderCreateView(generics.CreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         user = request.user
 
@@ -49,17 +52,21 @@ class OrderCreateView(generics.CreateAPIView):
         nearest_restaurant.save()
 
         # Release restaurant after 15 minutes
-        release_restaurant_after_timeout(nearest_restaurant.id)
+        try:
+            release_restaurant.apply_async((nearest_restaurant.id,), countdown=900)
+        except Exception as e:
+            transaction.set_rollback(True)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"message": "Order placed successfully!"}, status=status.HTTP_201_CREATED)
 
-def release_restaurant_after_timeout(restaurant_id, timeout=900):
-    def release():
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-        restaurant.status = 'available'
-        restaurant.save()
-    timer = threading.Timer(timeout, release)
-    timer.start()
+# def release_restaurant_after_timeout(restaurant_id, timeout=900):
+#     def release():
+#         restaurant = Restaurant.objects.get(id=restaurant_id)
+#         restaurant.status = 'available'
+#         restaurant.save()
+#     timer = threading.Timer(timeout, release)
+#     timer.start()
 
 class OrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer

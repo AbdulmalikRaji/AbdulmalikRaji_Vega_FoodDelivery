@@ -35,7 +35,8 @@ class SignupSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')  # Remove confirm_password before saving
+        # Remove confirm_password before saving
+        validated_data.pop('confirm_password')  
         
         # Create user and hash password
         user = User.objects.create(

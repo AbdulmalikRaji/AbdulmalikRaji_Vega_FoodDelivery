@@ -81,7 +81,7 @@ class SignupView(APIView):
                     message=f'Click the link to verify your email: {verification_link}',
                     from_email='dfood1986@gmail.com',
                     recipient_list=[user.email],
-                    fail_silently=False,  # IMPORTANT: Fail explicitly
+                    fail_silently=False,
                 )
 
                 return Response({
