@@ -99,7 +99,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware"
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "food_delivery.middlewares.RefreshTokenMiddleware",
 ]
 
 ROOT_URLCONF = 'food_delivery.urls'
@@ -127,10 +128,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+API_BASE_URL = os.environ.get("API_BASE_URL")
+
 NPM_BIN_PATH = os.environ.get("NPM_PATH")
 
 WSGI_APPLICATION = 'food_delivery.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

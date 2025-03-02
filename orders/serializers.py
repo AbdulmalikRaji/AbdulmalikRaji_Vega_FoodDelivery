@@ -28,10 +28,10 @@ class OrderRequestSerializer(serializers.Serializer):
     )
 
 class RatingSerializer(serializers.Serializer):
-    id = serializers.IntegerField()  # This is the OrderItem ID
+    id = serializers.IntegerField() 
     order_id = serializers.IntegerField()
     rating = serializers.IntegerField(min_value=1, max_value=5)
-    comment = serializers.CharField(required=False, allow_blank=True, min_length=15, max_length=200)
+    comment = serializers.CharField(required=False, allow_blank=True, max_length=200)
     
     def validate(self, data):
         order_id = data.get('order_id')

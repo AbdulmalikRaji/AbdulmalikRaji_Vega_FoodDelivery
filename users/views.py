@@ -16,6 +16,7 @@ from django.contrib.auth import get_user_model
 from .utils import reset_password_token
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 import re
 
 
@@ -180,3 +181,25 @@ class ResetPasswordView(APIView):
 
         except Exception as e:
             return Response({"error": "Invalid request."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class TestTokenView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"message": "Token is valid!"})
+    
+class TokenRefreshView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response({"error": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            new_access_token = str(refresh.access_token)
+            return Response({"access": new_access_token}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"error": "Invalid or expired refresh token."}, status=status.HTTP_401_UNAUTHORIZED)

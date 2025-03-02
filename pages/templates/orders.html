@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+  <h1 class="text-4xl font-bold text-[#66B2FF] mb-6">My Orders</h1>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="bg-[#1c1f25] p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-2xl text-[#66B2FF] font-semibold">Order #{{ order.id }}</h2>
+        <p class="text-[#B0B3B8] mt-1">Status: <span class="font-bold">{{ order.status }}</span></p>
+        <p class="text-[#B0B3B8] mt-1">Order Time: {{ order.order_time }}</p>
+        <p class="text-[#B0B3B8] mt-1">Delivery Time: {{ order.delivery_time }}</p>
+        <p class="text-[#B0B3B8] mt-1">Restaurant: {{ order.restaurant }} ({{ order.restaurant_address }})</p>
+
+        <h3 class="text-lg text-[#66B2FF] font-semibold mt-4">Items:</h3>
+        <ul>
+          {% for item in order.items %}
+            <li class="border-b border-gray-700 py-4">
+              <p class="text-[#E4E6EB]">{{ item.food_name }} ({{ item.quantity }})</p>
+              {% if order.status == 'Delivered' %}
+
+              {% if item.rating %}
+                <p class="text-yellow-400">Your Rating: {{ item.rating }} ★</p>
+                {% if item.comment %}
+                  <p class="text-[#B0B3B8]">Comment: "{{ item.comment }}"</p>
+                {% endif %}
+              {% else %}
+                <div id="rating-form-{{ item.id }}">
+                  <label for="rating-{{ item.id }}" class="text-[#B0B3B8]">Rate this item:</label>
+                  <select id="rating-{{ item.id }}" class="p-2 px-4 rounded-md bg-[#2A2E36] text-[#66B2FF]">
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                  </select>
+                  <input 
+                    type="text" 
+                    id="comment-{{ item.id }}" 
+                    placeholder="Leave a comment (optional)" 
+                    class="p-2 w-full mt-2 rounded-md bg-[#2A2E36] text-[#66B2FF]"
+                  />
+                  <button 
+                    onclick="openRatingConfirmation({{ item.id }}, {{ order.id }})"
+                    class="mt-2 py-2 px-4 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-md transition"
+                  >
+                    Submit
+                  </button>
+                </div>
+                <p id="rating-error-{{ item.id }}" class="text-red-500 mt-2 hidden"></p>
+              {% endif %}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-[#B0B3B8]">You have no orders yet.</p>
+  {% endif %}
+</div>
+
+<!-- Rating Confirmation Modal -->
+<div id="rating-confirmation-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-[#2A2E36] p-6 rounded-lg shadow-lg text-center w-full max-w-md">
+    <h2 class="text-2xl text-[#66B2FF] font-semibold mb-4">Confirm Rating</h2>
+    <p class="text-[#E4E6EB] mb-6">Are you sure you want to submit this rating?</p>
+    <div class="space-x-4">
+      <button
+        onclick="confirmRatingSubmission()"
+        class="py-2 px-6 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-md transition"
+      >
+        Yes
+      </button>
+      <button
+        onclick="closeRatingConfirmation()"
+        class="py-2 px-6 bg-[#f6413b] hover:bg-[#f74747e4] text-white rounded-md transition"
+      >
+        No
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Pass access token to JavaScript -->
+<script>
+    const accessToken = "{{ request.session.access_token|default:'' }}";
+    let currentItemId = null;
+    let currentOrderId = null;
+  
+    // Open Confirmation Modal
+    function openRatingConfirmation(itemId, orderId) {
+      currentItemId = itemId;
+      comment = console.log(document.getElementById(`comment-${currentItemId}`).value)
+      currentOrderId = orderId;
+      document.getElementById("rating-confirmation-modal").classList.remove("hidden");
+    }
+  
+    // Close Confirmation Modal
+    function closeRatingConfirmation() {
+      document.getElementById("rating-confirmation-modal").classList.add("hidden");
+    }
+  
+    // Submit Rating after Confirmation
+    function confirmRatingSubmission() {
+      closeRatingConfirmation(); 
+  
+      const rating = document.getElementById(`rating-${currentItemId}`).value;
+      const comment = document.getElementById(`comment-${currentItemId}`).value.trim();
+      const errorContainer = document.getElementById(`rating-error-${currentItemId}`);
+  
+      if (!rating) {
+        errorContainer.textContent = "You must select a rating.";
+        errorContainer.classList.remove("hidden");
+        return;
+      }
+  
+      fetch('/api/orders/rate-order/', {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          id: currentItemId,
+          order_id: currentOrderId,
+          rating: rating,
+          comment: comment
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          // Replace the form with the rating text
+          document.getElementById(`rating-form-${currentItemId}`).innerHTML = `
+            <p class="text-yellow-400">Your Rating: ${rating} ★</p>
+            ${comment ? `<p class="text-[#B0B3B8]">Comment: "${comment}"</p>` : ""}
+          `;
+        } else {
+          errorContainer.textContent = data.error || "Failed to submit rating.";
+          errorContainer.classList.remove("hidden");
+        }
+      })
+      .catch(error => console.error("Error:", error));
+    }
+  </script>
+  
+{% endblock %}

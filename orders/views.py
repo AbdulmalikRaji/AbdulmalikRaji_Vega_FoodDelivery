@@ -88,7 +88,7 @@ class SubmitRatingView(APIView):
 
             # Update each item with the rating and comment
             ordered_food.rating = rating
-            if ordered_food.comment:
+            if comment:
                 ordered_food.comment = comment
 
             ordered_food.save()

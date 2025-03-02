@@ -30,7 +30,9 @@
             <li class="border-b border-gray-700 pb-4">
               <p class="text-sm text-[#66B2FF] font-bold">{{ comment.order.user.username }} 
               <span class="text-[#B0B3B8] text-xs ml-2">({{ comment.order.order_time|date:"M d, Y" }})</span></p>
-              <p class="text-[#B0B3B8] mt-1">"{{ comment.comment }}"</p>
+              {% if comment.comment %}
+                <p class="text-[#B0B3B8] mt-1">"{{ comment.comment }}"</p>
+              {% endif %}
               <p class="text-yellow-400">Rating: {{ comment.rating }} ★</p>
             </li>
           {% endfor %}

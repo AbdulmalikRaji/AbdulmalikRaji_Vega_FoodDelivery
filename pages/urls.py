@@ -8,6 +8,7 @@ from .email_verified import EmailVerifiedView
 from .menu import MenuPageView
 from .menu_item import MenuItemView
 from .cart import cart_view, add_to_cart, update_cart, checkout_order
+from .orders import orders_page
 
 urlpatterns = [
     path('', homepage, name='home'),
@@ -22,4 +23,5 @@ urlpatterns = [
     path('cart/', cart_view, name='cart-view'),
     path('cart/update/<int:id>/', update_cart, name='update-cart'),
     path('order/checkout/', checkout_order, name='checkout-order'),
+    path('orders/', orders_page, name='orders-page'),
 ]
