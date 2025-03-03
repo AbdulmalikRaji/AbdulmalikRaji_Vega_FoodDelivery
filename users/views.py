@@ -18,6 +18,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 import re
+import os
 
 
 User = get_user_model()
@@ -79,7 +80,7 @@ class SignupView(APIView):
                 send_mail(
                     subject='Verify Your Email',
                     message=f'Click the link to verify your email: {verification_link}',
-                    from_email='dfood1986@gmail.com',
+                    from_email=os.environ.get("EMAIL_ADDRESS"),
                     recipient_list=[user.email],
                     fail_silently=False,
                 )
@@ -136,7 +137,7 @@ class ForgotPasswordView(APIView):
             send_mail(
                 subject='Reset Your Password',
                 message=f'Click the link to reset password for user @{user.username}: {reset_link}',
-                from_email='no-reply@fooddelivery.com',
+                from_email=os.environ.get("EMAIL_ADDRESS"),
                 recipient_list=[user.email],
                 fail_silently=False,
             )
