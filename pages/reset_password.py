@@ -14,7 +14,7 @@ class ResetPasswordPageView(View):
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
 
-        # Send POST request to your existing API endpoint
+        # Send POST request to API endpoint
         api_url = request.build_absolute_uri(f'/api/user/reset-password/{uidb64}/{token}/')
         payload = {
             'new_password': new_password,

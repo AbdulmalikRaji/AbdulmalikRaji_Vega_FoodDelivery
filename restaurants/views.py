@@ -6,6 +6,7 @@ from .serializers import FoodSerializer
 class FoodListView(generics.ListAPIView):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
+    permission_classes = []
 
     def get_queryset(self):
         queryset = super().get_queryset()
