@@ -32,6 +32,13 @@ class FoodTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response.data), 0)
 
+    def test_filter_food_by_rating(self):
+        """Test filtering food by minimum rating"""
+        url = reverse('food-list') + "?min_rating=4"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
     def test_get_food_detail(self):
         """Test retrieving a specific food item"""
         url = reverse('food-item', kwargs={'id': self.food1.id})
