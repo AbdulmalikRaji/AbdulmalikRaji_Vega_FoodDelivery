@@ -5,7 +5,7 @@ A Django & React-powered food delivery app with authentication, real-time order 
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/food_delivery.git
+git clone https://github.com/abdulmalikraji/AbdulmalikRaji_Vega_FoodDelivery.git
 cd food_delivery
 ```
 
