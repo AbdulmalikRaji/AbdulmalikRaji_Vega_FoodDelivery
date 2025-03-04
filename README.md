@@ -27,7 +27,7 @@ Create a .env file in the root directory and add:
 ```text
 SECRET_KEY=your-secret-key
 DEBUG=True 
-GOOGLE_MAPS_API_KEY=apikey #optional only for hen users dont accept location permissions
+GOOGLE_MAPS_API_KEY=apikey #optional only for when users dont accept location permissions
 
 # Database (PostgreSQL)
 POSTGRES_NAME=food_delivery_db
