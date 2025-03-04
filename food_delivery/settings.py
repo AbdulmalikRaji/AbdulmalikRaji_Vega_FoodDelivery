@@ -85,8 +85,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': os.environ.get("ACCESS_TOKEN_LIFETIME"),
-    'REFRESH_TOKEN_LIFETIME': os.environ.get("REFRESH_TOKEN_LIFETIME"),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get("ACCESS_TOKEN_LIFETIME_MINUTES"))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get("REFRESH_TOKEN_LIFETIME_MINUTES"))),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 

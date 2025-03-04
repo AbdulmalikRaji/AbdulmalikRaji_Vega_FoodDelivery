@@ -21,13 +21,13 @@ class FoodSerializer(serializers.ModelSerializer):
         # Get the number of comments to show, default to 1
         request = self.context.get('request')
         num_comments = int(request.query_params.get('num_comments', 1))
-        num_comments = min(max(num_comments, 1), 5)  # Clamp between 1 and 5
+        num_comments = min(max(num_comments, 1), 5)
 
         # Fetch comments for this food item along with user who commented
         comments = (
             OrderItem.objects
             .filter(food=obj, comment__isnull=False)
-            .select_related('order__user')  # Efficiently join with user
+            .select_related('order__user')  # join with user
             .order_by('-id')[:num_comments]
         )
         return CommentSerializer(comments, many=True).data

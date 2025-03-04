@@ -15,7 +15,7 @@ class SignupSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'username', 'email', 'password', 'confirm_password', 'longitude', 'latitude', 'delivery_location']
 
     def validate_password(self, value):
-        # Django's default password validation
+        # default password validation
         try:
             validate_password(value)
         except ValidationError as e:

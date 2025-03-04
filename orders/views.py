@@ -60,17 +60,9 @@ class OrderCreateView(generics.CreateAPIView):
 
         return Response({"message": "Order placed successfully!"}, status=status.HTTP_201_CREATED)
 
-# def release_restaurant_after_timeout(restaurant_id, timeout=900):
-#     def release():
-#         restaurant = Restaurant.objects.get(id=restaurant_id)
-#         restaurant.status = 'available'
-#         restaurant.save()
-#     timer = threading.Timer(timeout, release)
-#     timer.start()
-
 class OrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]  # Only authenticated users can access
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Get the current authenticated user
@@ -92,7 +84,6 @@ class SubmitRatingView(APIView):
             # Get the order and item
             ordered_food = OrderItem.objects.get(id=order_item_id)
             
-
             # Update each item with the rating and comment
             ordered_food.rating = rating
             if comment:
@@ -104,7 +95,7 @@ class SubmitRatingView(APIView):
             food_id = ordered_food.food_id
             food = Food.objects.get(id=food_id)
             avg_rating = OrderItem.objects.filter(food=food).aggregate(Avg('rating'))['rating__avg']
-            food.rating = round(avg_rating, 2)  # Round to 2 decimal places
+            food.rating = round(avg_rating, 2)
             food.save()
 
             return Response({"message": "Rating submitted successfully!"}, status=status.HTTP_200_OK)

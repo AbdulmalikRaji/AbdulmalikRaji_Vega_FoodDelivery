@@ -24,7 +24,8 @@ import os
 User = get_user_model()
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]  # Allow public access
+    # Allow public access
+    permission_classes = [AllowAny]  
     authentication_classes = []
 
     def post(self, request, *args, **kwargs):
