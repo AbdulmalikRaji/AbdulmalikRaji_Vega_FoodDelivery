@@ -16,7 +16,6 @@ class LoginPageView(View):
         # Authenticate the user
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            print(user.is_verified)
             if user.is_verified == False:
                 return JsonResponse({"error": "User email is not verified"}, status=401)
             # Login the user
