@@ -33,4 +33,5 @@ class FoodDetailView(generics.RetrieveAPIView):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
     lookup_field = 'id'
+    permission_classes = []
 
