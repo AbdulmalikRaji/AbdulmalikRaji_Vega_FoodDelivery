@@ -109,7 +109,15 @@ Visit ```http://127.0.0.1:8000/``` to see the app.
 
 Visit ```http://127.0.0.1:8000/admin``` to login to admin panel.
 
-## 10. API Endpoints
+## 10. Running Tests
+
+Run tests with the following command
+
+```bash
+python manage.py test ./tests
+```
+
+## 11. API Endpoints
 
 The API includes:
 
@@ -118,4 +126,8 @@ The API includes:
 - Order Processing (/api/orders/order/)
 - Order Rating (/api/orders/rate-order/)
 
-For full API documentation, use Postman or check urls.py.
+For full API documentation, visit:
+
+```http
+https://documenter.getpostman.com/view/26792215/2sAYdinpFQ
+```
