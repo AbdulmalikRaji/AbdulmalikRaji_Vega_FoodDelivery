@@ -34,6 +34,9 @@ class LoginView(APIView):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            if user.is_verified == False:
+                return Response({"error": "User email is not verified"}, status=status.HTTP_401_UNAUTHORIZED)
+            
             # Log the user in for session authentication
             login(request, user)
 
@@ -83,7 +86,7 @@ class SignupView(APIView):
                     message=f'Click the link to verify your email: {verification_link}',
                     from_email=os.environ.get("EMAIL_ADDRESS"),
                     recipient_list=[user.email],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
 
                 return Response({
@@ -126,6 +129,9 @@ class ForgotPasswordView(APIView):
         try:
             # Get user by email
             user = User.objects.get(email=email)
+
+            if user.is_verified == False:
+                return Response({"error": "User email is not verified"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Generate reset link
             uid = urlsafe_base64_encode(force_bytes(user.pk))

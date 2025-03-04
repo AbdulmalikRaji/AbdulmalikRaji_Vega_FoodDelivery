@@ -60,8 +60,8 @@ class SignupPageView(View):
         try:
             response = requests.post(api_url, json=payload)
             if response.status_code == 201:
-                # Success - Redirect to the success page
-                return redirect('email-verified')
+                # Success - Redirect to the login page
+                return redirect('login')
             else:
                 # Error from API - Show error message
                 error_message = response.json().get('error', 'Something went wrong.')
